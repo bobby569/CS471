@@ -1,0 +1,6 @@
+layouts/
+test_cases/
+
+*.pyc
+
+VERSION
