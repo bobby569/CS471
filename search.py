@@ -113,13 +113,58 @@ def depthFirstSearch(problem):
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    visited = set()
+    queue = util.Queue()
+    state = problem.getStartState()
+
+    queue.push((None, None, state)) # (parent, action, state)
+    while not queue.isEmpty():
+        node = queue.pop()
+        state = node[2]
+        if state in visited: continue
+        visited.add(state)
+        if problem.isGoalState(state): break
+
+        for succ in problem.getSuccessors(state):
+            if succ[0] not in visited:
+                temp = (node, succ[1], succ[0])
+                queue.push(temp)
+
+    res = []
+    while node[1]:
+        res.insert(0, node[1])
+        node = node[0]
+
+    return res
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    visited = set()
+    pq = util.PriorityQueue()
+    state = problem.getStartState()
+
+    pq.push((None, None, state, 0), 0) # (parent, action, state, cost)
+    while not pq.isEmpty():
+        node = pq.pop()
+        state = node[2]
+        cost = node[3]
+        if state in visited: continue
+        visited.add(state)
+        if problem.isGoalState(state): break
+
+        for succ in problem.getSuccessors(state):
+            if succ[0] not in visited:
+                new_cost = succ[2] + cost
+                temp = (node, succ[1], succ[0], new_cost)
+                pq.push(temp, new_cost)
+
+    res = []
+    while node[1]:
+        res.insert(0, node[1])
+        node = node[0]
+
+    return res
 
 def nullHeuristic(state, problem=None):
     """
