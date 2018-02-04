@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -82,12 +82,34 @@ def depthFirstSearch(problem):
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
 
-    print "Start:", problem.getStartState()
-    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-    print "Start's successors:", problem.getSuccessors(problem.getStartState())
+    print "Start:", problem.getStartState() -> (5, 5)
+    print "Is the start a goal?", problem.isGoalState(problem.getStartState()) -> False
+    print "Start's successors:", problem.getSuccessors(problem.getStartState()) -> [((5, 4), 'South', 1), ((4, 5), 'West', 1)]
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    visited = set()
+    stack = util.Stack()
+    state = problem.getStartState()
+
+    stack.push((None, None, state)) # (parent, action, state)
+    while not stack.isEmpty():
+        node = stack.pop()
+        state = node[2]
+        if state in visited: continue
+        visited.add(state)
+        if problem.isGoalState(state): break
+
+        for succ in problem.getSuccessors(state):
+            if succ[0] not in visited:
+                temp = (node, succ[1], succ[0])
+                stack.push(temp)
+
+    res = []
+    while node[1]:
+        res.insert(0, node[1])
+        node = node[0]
+
+    return res
+
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
