@@ -345,8 +345,8 @@ def euclideanDistance(xy1, xy2):
 
 def getClosestDistance(position, unvisited):
     idx, min_dist = -1, sys.maxint
-    for i in xrange(len(unvisited)):
-        dist = euclideanDistance(position, unvisited[i])
+    for i, un in enumerate(unvisited):
+        dist = euclideanDistance(position, un)
         if min_dist > dist:
             idx, min_dist = i, dist
     return idx, min_dist
@@ -369,7 +369,7 @@ def cornersHeuristic(state, problem):
     position, corner_state = state
     cost, unvisited = 0, list(corner_state)
 
-    while len(unvisited) != 0:
+    while unvisited:
         idx, dist = getClosestDistance(position, unvisited)
         cost += dist
         position = unvisited.pop(idx)
