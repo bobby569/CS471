@@ -148,9 +148,9 @@ def uniformCostSearch(problem):
     while not pq.isEmpty():
         node = pq.pop()
         state = node[2]
-        cost = node[3]
         if state in visited: continue
         visited.add(state)
+        cost = node[3]
         if problem.isGoalState(state): break
 
         for succ in problem.getSuccessors(state):
@@ -186,10 +186,10 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     while not pq.isEmpty():
         node = pq.pop()
         state = node[2]
-        g = node[3]
-        h = node[4]
         if state in visited: continue
         visited.add(state)
+        g = node[3]
+        h = node[4]
         if problem.isGoalState(state): break
 
         for succ in problem.getSuccessors(state):
