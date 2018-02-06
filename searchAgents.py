@@ -40,6 +40,7 @@ from game import Actions
 import util
 import time
 import search
+import sys
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -317,6 +318,8 @@ class CornersProblem(search.SearchProblem):
             # Here's a code snippet for figuring out whether a new position hits a wall:
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
+            if (nextx, nexty) in self.corners and (nextx, nexty) not in state[1]:
+                continue
             if not self.walls[nextx][nexty]:
                 nextState = ((nextx, nexty), tuple(i for i in state[1] if i != state[0]))
                 successors.append( ( nextState, action, 1) )
@@ -337,6 +340,16 @@ class CornersProblem(search.SearchProblem):
             if self.walls[x][y]: return 999999
         return len(actions)
 
+def euclideanDistance(xy1, xy2):
+    return ((xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2) ** 0.68
+
+def getClosestDistance(position, unvisited):
+    idx, min_dist = -1, sys.maxint
+    for i in xrange(len(unvisited)):
+        dist = euclideanDistance(position, unvisited[i])
+        if min_dist > dist:
+            idx, min_dist = i, dist
+    return idx, min_dist
 
 def cornersHeuristic(state, problem):
     """
@@ -351,11 +364,17 @@ def cornersHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
-    corners = problem.corners # These are the corner coordinates
-    walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
+    if problem.isGoalState(state):
+        return 0
+    position, corner_state = state
+    cost, unvisited = 0, list(corner_state)
 
-    "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    while len(unvisited) != 0:
+        idx, dist = getClosestDistance(position, unvisited)
+        cost += dist
+        position = unvisited.pop(idx)
+
+    return cost
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
