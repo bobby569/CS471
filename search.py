@@ -110,7 +110,6 @@ def depthFirstSearch(problem):
 
     return res
 
-
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     visited = set()
@@ -125,7 +124,7 @@ def breadthFirstSearch(problem):
         visited.add(state)
         if problem.isGoalState(state): break
 
-        for succ in problem.getSuccessors(state):
+        for succ in problem.getSuccessors(state)[::-1]:
             if succ[0] not in visited:
                 temp = (node, succ[1], succ[0])
                 queue.push(temp)
@@ -136,7 +135,6 @@ def breadthFirstSearch(problem):
         node = node[0]
 
     return res
-
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
@@ -149,9 +147,9 @@ def uniformCostSearch(problem):
         node = pq.pop()
         state = node[2]
         if state in visited: continue
+        if problem.isGoalState(state): break
         visited.add(state)
         cost = node[3]
-        if problem.isGoalState(state): break
 
         for succ in problem.getSuccessors(state):
             if succ[0] not in visited:
@@ -179,24 +177,22 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     pq = util.PriorityQueue()
     state = problem.getStartState()
 
-    g_n = 0
     h_n = heuristic(state, problem)
     # (parent, action, state, cost, heuristic)
-    pq.push((None, None, state, g_n, h_n), g_n + h_n)
+    pq.push((None, None, state, 0, h_n), 0 + h_n)
     while not pq.isEmpty():
         node = pq.pop()
         state = node[2]
         if state in visited: continue
+        if problem.isGoalState(state): break
         visited.add(state)
         g = node[3]
-        h = node[4]
-        if problem.isGoalState(state): break
 
         for succ in problem.getSuccessors(state):
             if succ[0] not in visited:
-                new_cost = succ[2] + g + h
-                temp = (node, succ[1], succ[0], succ[2] + g, heuristic(succ[0], problem))
-                pq.push(temp, new_cost)
+                h = heuristic(succ[0], problem)
+                temp = (node, succ[1], succ[0], succ[2] + g, h)
+                pq.push(temp, succ[2] + g + h)
 
     res = []
     while node[1]:
