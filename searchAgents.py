@@ -466,10 +466,9 @@ def foodHeuristic(state, problem):
     position, foodGrid = state
     cost, unvisited = 0, foodGrid.asList()
 
-    while unvisited:
-        idx, dist = getClosestDistance(position, unvisited)
-        cost += dist
-        position = unvisited.pop(idx)
+    for un in unvisited:
+        dist = mazeDistance(position, un, problem.startingGameState)
+        cost = max(cost, dist)
 
     return cost
 
