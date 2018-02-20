@@ -4,19 +4,16 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
-
-from util import manhattanDistance
-from game import Directions
+from util import manhattanDistance as manDist
+from game import Agent, Directions
 import random, util
-
-from game import Agent
 
 class ReflexAgent(Agent):
     """
@@ -27,7 +24,6 @@ class ReflexAgent(Agent):
       it in any way you see fit, so long as you don't touch our method
       headers.
     """
-
 
     def getAction(self, gameState):
         """
@@ -44,11 +40,10 @@ class ReflexAgent(Agent):
         # Choose one of the best actions
         scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
         bestScore = max(scores)
-        bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
+        bestIndices = [idx for idx, val in enumerate(scores) if val == bestScore]
         chosenIndex = random.choice(bestIndices) # Pick randomly among the best
 
         "Add more of your code here if you want to"
-
         return legalMoves[chosenIndex]
 
     def evaluationFunction(self, currentGameState, action):
@@ -71,10 +66,28 @@ class ReflexAgent(Agent):
         newPos = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+        ghostPos = set(ghost.getPosition() for ghost in newGhostStates)
 
-        "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        """
+        1. If successor wins the game, just do it.
+        2. If successor meets the ghost, never do it.
+        3. If number of food decreases, the score gets higher (20 works but 10 doesn't).
+        4. If get closer to food, the score get higher.
+        5. The closest ghost should be as far as possible (set 4 as safe distance).
+        """
+        if successorGameState.isWin():
+            return float("inf")
+        if newPos in ghostPos or action == Directions.STOP:
+            return float("-inf")
+
+        score = 0
+        score -= 20 * sum(int(j) for i in newFood for j in i)
+        score -= min(manDist(newPos, (i, j))
+                     for i, row in enumerate(newFood)
+                     for j, food in enumerate(row)
+                     if food)
+        score -= 4 / min(manDist(gPos, newPos) for gPos in ghostPos)
+        return score
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -170,4 +183,3 @@ def betterEvaluationFunction(currentGameState):
 
 # Abbreviation
 better = betterEvaluationFunction
-

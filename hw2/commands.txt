@@ -1,0 +1,28 @@
+python2 autograder.py
+python2 autograder.py -t test cases/q2/0-small-tree
+
+python2 pacman.py
+python2 pacman.py -p ReflexAgent
+
+python2 pacman.py -p ReflexAgent -l testClassic
+python2 pacman.py --frameTime 0 -p ReflexAgent -k 1
+python2 pacman.py --frameTime 0 -p ReflexAgent -k 2
+python2 autograder.py -q q1
+python2 autograder.py -q q1 --no-graphics
+
+python2 autograder.py -q q2
+python2 autograder.py -q q2 --no-graphics
+
+python2 pacman.py -p MinimaxAgent -l minimaxClassic -a depth=4
+python2 pacman.py -p MinimaxAgent -l trappedClassic -a depth=3
+
+python2 pacman.py -p AlphaBetaAgent -a depth=3 -l smallClassic
+python2 autograder.py -q q3
+python2 autograder.py -q q3 --no-graphics
+
+python2 autograder.py -q q4
+python2 pacman.py -p ExpectimaxAgent -l minimaxClassic -a depth=3
+python2 pacman.py -p AlphaBetaAgent -l trappedClassic -a depth=3 -q -n 10
+python2 pacman.py -p ExpectimaxAgent -l trappedClassic -a depth=3 -q -n 10
+
+python2 autograder.py -q q5
