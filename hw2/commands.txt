@@ -12,7 +12,6 @@ python2 autograder.py -q q1 --no-graphics
 
 python2 autograder.py -q q2
 python2 autograder.py -q q2 --no-graphics
-
 python2 pacman.py -p MinimaxAgent -l minimaxClassic -a depth=4
 python2 pacman.py -p MinimaxAgent -l trappedClassic -a depth=3
 
