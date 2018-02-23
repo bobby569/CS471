@@ -143,14 +143,12 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 return self.evaluationFunction(gameState)
             val = float("inf")
             actions = gameState.getLegalActions(ghost_index)
-            succState = [gameState.generateSuccessor(ghost_index, action)
-                         for action in actions]
-            for state in succState:
+            for action in actions:
+                nextState = gameState.generateSuccessor(ghost_index, action)
                 if ghost_index < gameState.getNumAgents() - 1:
-                    # Calculate the value for the next ghost
-                    val = min(val, min_value(state, depth, ghost_index + 1))
+                    val = min(val, min_value(nextState, depth, ghost_index + 1))
                 else:
-                    val = min(val, max_value(state, depth-1))
+                    val = min(val, max_value(nextState, depth-1))
             return val
 
         def max_value(gameState, depth):
@@ -158,10 +156,9 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 return self.evaluationFunction(gameState)
             val = -float("inf")
             actions = gameState.getLegalActions(0)
-            succState = [gameState.generateSuccessor(0, action)
-                         for action in actions]
-            for state in succState:
-                val = max(val, min_value(state, depth, 1))
+            for action in actions:
+                nextState = gameState.generateSuccessor(0, action)
+                val = max(val, min_value(nextState, depth, 1))
             return val
 
         actions = gameState.getLegalActions(0)
@@ -182,41 +179,46 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
           Returns the minimax action using self.depth and self.evaluationFunction
         """
-        def min_value(gameState, depth, ghost_index):
+        def min_value(gameState, depth, ghost_index, alpha, beta):
             if depth == 0 or gameState.isWin() or gameState.isLose():
                 return self.evaluationFunction(gameState)
             val = float("inf")
             actions = gameState.getLegalActions(ghost_index)
-            succState = [gameState.generateSuccessor(ghost_index, action)
-                         for action in actions]
-            for state in succState:
+            for action in actions:
+                nextState = gameState.generateSuccessor(ghost_index, action)
                 if ghost_index < gameState.getNumAgents() - 1:
-                    # Calculate the value for the next ghost
-                    val = min(val, min_value(state, depth, ghost_index + 1))
+                    val = min(val, min_value(nextState, depth, ghost_index + 1, alpha, beta))
                 else:
-                    val = min(val, max_value(state, depth-1))
+                    val = min(val, max_value(nextState, depth-1, alpha, beta))
+                if val < alpha: return val
+                beta = min(beta, val)
             return val
 
-        def max_value(gameState, depth):
+        def max_value(gameState, depth, alpha, beta):
             if depth == 0 or gameState.isWin() or gameState.isLose():
                 return self.evaluationFunction(gameState)
             val = -float("inf")
             actions = gameState.getLegalActions(0)
-            succState = [gameState.generateSuccessor(0, action)
-                         for action in actions]
-            for state in succState:
-                val = max(val, min_value(state, depth, 1))
+            for action in actions:
+                nextState = gameState.generateSuccessor(0, action)
+                val = max(val, min_value(nextState, depth, 1, alpha, beta))
+                if val > beta: return val
+                alpha = max(alpha, val)
             return val
 
         actions = gameState.getLegalActions(0)
         move = Directions.STOP
         val = -float("inf")
+        alpha = -float("inf")
+        beta = float("inf")
         for action in actions:
             nextState = gameState.generateSuccessor(0, action)
-            temp = min_value(nextState, self.depth, 1)
+            temp = min_value(nextState, self.depth, 1, alpha, beta)
             if temp > val:
                 val = temp
                 move = action
+            if val > beta: return move
+            alpha = max(alpha, val)
         return move
 
 
