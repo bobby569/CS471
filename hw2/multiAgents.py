@@ -64,7 +64,7 @@ class ReflexAgent(Agent):
         # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         newPos = successorGameState.getPacmanPosition()
-        newFood = successorGameState.getFood()
+        newFood = successorGameState.getFood().asList()
         newGhostStates = successorGameState.getGhostStates()
         ghostPos = set(ghost.getPosition() for ghost in newGhostStates)
 
@@ -81,11 +81,8 @@ class ReflexAgent(Agent):
             return -float("inf")
 
         score = 10000
-        score -= 20 * sum(int(j) for i in newFood for j in i)
-        score -= min(manDist(newPos, (i, j))
-                     for i, row in enumerate(newFood)
-                     for j, food in enumerate(row)
-                     if food)
+        score -= 20 * len(newFood)
+        score -= min(manDist(newPos, food) for food in newFood)
         score -= 4 / min(manDist(gPos, newPos) for gPos in ghostPos)
         return score
 
@@ -231,18 +228,68 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           All ghosts should be modeled as choosing uniformly at random from their
           legal moves.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        def exp_value(gameState, depth, ghost_index):
+            if depth == 0 or gameState.isWin() or gameState.isLose():
+                return self.evaluationFunction(gameState)
+            val = 0
+            actions = gameState.getLegalActions(ghost_index)
+            for action in actions:
+                nextState = gameState.generateSuccessor(ghost_index, action)
+                if ghost_index < gameState.getNumAgents() - 1:
+                    val += exp_value(nextState, depth, ghost_index + 1)
+                else:
+                    val += max_value(nextState, depth-1)
+            return float(val) / len(actions)
+
+        def max_value(gameState, depth):
+            if depth == 0 or gameState.isWin() or gameState.isLose():
+                return self.evaluationFunction(gameState)
+            val = -float("inf")
+            actions = gameState.getLegalActions(0)
+            for action in actions:
+                nextState = gameState.generateSuccessor(0, action)
+                val = max(val, exp_value(nextState, depth, 1))
+            return val
+
+        actions = gameState.getLegalActions(0)
+        move = Directions.STOP
+        val = -float("inf")
+        for action in actions:
+            nextState = gameState.generateSuccessor(0, action)
+            temp = exp_value(nextState, self.depth, 1)
+            if temp > val:
+                val = temp
+                move = action
+        return move
 
 def betterEvaluationFunction(currentGameState):
     """
       Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
       evaluation function (question 5).
 
-      DESCRIPTION: <write something here so we know what you did>
+      DESCRIPTION:
+      1. The less food left, the better.
+      2. The less cpasule left, the better.
+      3. Getting closer to food, the better.
+      4. Getting farther away from the closest ghost, the better.
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    if currentGameState.isWin():
+        return float("inf")
+    if currentGameState.isLose():
+        return -float("inf")
+
+    score = scoreEvaluationFunction(currentGameState)
+    pacmanPos = currentGameState.getPacmanPosition()
+    ghostPos = currentGameState.getGhostPositions()
+    foodPos = currentGameState.getFood().asList()
+    capsule = currentGameState.getCapsules()
+
+    score -= 2.4 * len(foodPos)
+    score -= 2.4 * len(capsule)
+    score -= 1.1 * min(manDist(pacmanPos, pos) for pos in foodPos)
+    score -= 4 / min(manDist(pacmanPos, ghost) for ghost in ghostPos)
+
+    return score
 
 # Abbreviation
 better = betterEvaluationFunction
