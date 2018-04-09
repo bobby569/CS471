@@ -13,11 +13,11 @@ python2 gridworld.py -a value -i 100 -g BridgeGrid --discount 0.9 --noise 0.2
 python2 autograder.py -q q2
 
 python2 autograder.py -q q3
+
 python2 gridworld.py -a q -k 5 -m
-
 python2 autograder.py -q q4
-python2 gridworld.py -a q -k 100
 
+python2 gridworld.py -a q -k 100
 python2 autograder.py -q q5
 python2 crawler.py
 
